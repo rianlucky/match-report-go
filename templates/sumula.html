@@ -1,33 +1,382 @@
-<form method="POST">
-    <label>Time Adversário:</label>
-    <input type="text" name="time_adversario" required>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Partida - Súmula</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sumula.css') }}">
+</head>
+<body>
+    <!-- Logo clicável -->
+    <a href="{{ url_for('dashboard') }}" class="logo" title="Voltar para o dashboard">
+        <img src="{{ url_for('static', filename='images/MRG_Logo.png') }}" alt="Logo MRG">
+    </a>
 
-    <table>
-        <tr>
-            <th>Jogador</th>
-            <th>Gol Marcado</th>
-            <th>Gol Sofrido</th>
-            <th>Gol Contra</th>
-            <th>Assist.</th>
-            <th>Falta Feita</th>
-            <th>Falta Sofrida</th>
-            <th>Amarelo</th>
-            <th>Vermelho</th>
-        </tr>
-        {% for j in jogadores %}
-        <tr>
-            <td>{{ j.nome }}</td>
-            <td><input type="number" name="gol_marcado_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="gol_sofrido_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="gol_contra_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="assistencia_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="falta_feita_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="falta_sofrida_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="cartao_amarelo_{{ j.id }}" value="0"></td>
-            <td><input type="number" name="cartao_vermelho_{{ j.id }}" value="0"></td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container sumula-container">
+        <h1>Iniciar Partida</h1>
 
-    <button type="submit">Salvar Súmula</button>
-</form>
+    <form method="POST" id="sumulaForm">
+
+        <div class="sumula-header header-row">
+            <input type="text" name="time_casa" class="team-name" placeholder="Time da Casa" value="Time da Casa">
+            <span id="scoreCasa" class="score" aria-label="Placar Time da Casa">0</span>
+            <div class="x">X</div>
+            <span id="scoreVisitante" class="score" aria-label="Placar Visitante">0</span>
+            <input type="text" name="time_adversario" class="team-name" placeholder="Time Adversário" required>
+        </div>
+
+        <div class="match-info">
+            <input type="date" name="data_partida" class="date-input" required>
+        </div>
+
+        <div class="sumula-grid">
+            <div class="player-area">
+                <!-- Parte 1: Cabeçalho da tabela -->
+                <div class="table-header">
+                    <div>Jogador</div>
+                    <div>Gol Marcado</div>
+                    <div>Gol Sofrido</div>
+                    <div>Gol Contra</div>
+                    <div>Assist.</div>
+                    <div>Falta Feita</div>
+                    <div>Falta Sofrida</div>
+                    <div>Amarelo</div>
+                    <div>Vermelho</div>
+                </div>
+
+                <!-- Lista de jogadores -->
+                <div id="playerRows">
+                {% for j in jogadores %}
+                <div class="player-row">
+                    <!-- Nome do jogador (select) -->
+                    <div>
+                        <select class="player-select" name="jogador_{{ j.id }}" required>
+                            <option value="">Selecione um jogador</option>
+                            {% for jogador in todos_jogadores %}
+                                <option value="{{ jogador.id }}">
+                                    {{ jogador.nome_completo }}
+                                    {% if jogador.apelido %}({{ jogador.apelido }}){% endif %}
+                                    - {{ jogador.numero if jogador.numero else 'S/N' }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Gol Marcado -->
+                    <div>
+                        <input id="gol_marcado_{{ j.id }}" class="stat-input stat-input-num" data-stat="gol_marcado" name="gol_marcado_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Gol Sofrido -->
+                    <div>
+                        <input id="gol_sofrido_{{ j.id }}" class="stat-input stat-input-num" data-stat="gol_sofrido" name="gol_sofrido_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Gol Contra -->
+                    <div>
+                        <input id="gol_contra_{{ j.id }}" class="stat-input stat-input-num" data-stat="gol_contra" name="gol_contra_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Assistência -->
+                    <div>
+                        <input id="assistencia_{{ j.id }}" class="stat-input stat-input-num" data-stat="assistencia" name="assistencia_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Falta Feita -->
+                    <div>
+                        <input id="falta_feita_{{ j.id }}" class="stat-input stat-input-num" data-stat="falta_feita" name="falta_feita_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Falta Sofrida -->
+                    <div>
+                        <input id="falta_sofrida_{{ j.id }}" class="stat-input stat-input-num" data-stat="falta_sofrida" name="falta_sofrida_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Cartão Amarelo -->
+                    <div>
+                        <input id="cartao_amarelo_{{ j.id }}" class="stat-input stat-input-num" data-stat="cartao_amarelo" name="cartao_amarelo_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+
+                    <!-- Cartão Vermelho -->
+                    <div>
+                        <input id="cartao_vermelho_{{ j.id }}" class="stat-input stat-input-num" data-stat="cartao_vermelho" name="cartao_vermelho_{{ j.id }}" type="number" value="0" min="0">
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-salvar" onclick="addNewPlayer()">Adicionar Jogador</button>
+                    <button type="submit" class="btn-salvar">Salvar Súmula</button>
+                </div>
+            </div>
+
+            <div class="agg-area">
+                <div id="agg_faltas_sofridas" class="agg-box">Faltas Sofridas: 0</div>
+                <div id="agg_faltas_feitas" class="agg-box">Faltas Feitas: 0</div>
+                <div id="agg_amarelos" class="agg-box">Cartões Amarelos: 0</div>
+                <div id="agg_vermelhos" class="agg-box">Cartões Vermelhos: 0</div>
+                
+                <!-- Cronômetro do jogo -->
+                <div class="game-timer">
+                    <div id="timer" class="game-timer-display">00:00</div>
+                    <div class="timer-controls">
+                        <button type="button" onclick="startTimer()" class="btn-salvar timer-btn">Iniciar</button>
+                        <button type="button" onclick="pauseTimer()" class="btn-salvar timer-btn">Pausar</button>
+                        <button type="button" onclick="resetTimer()" class="btn-salvar timer-btn">Zerar</button>
+                    </div>
+                    <div class="game-period">
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="game-period" value="first" checked>
+                                1° Tempo
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="game-period" value="second">
+                                2° Tempo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- Botão Voltar -->
+    <a href="{{ url_for('dashboard') }}" class="btn-voltar">
+        <button class="btn-salvar">Voltar</button>
+    </a>
+
+    <script>
+        // Lista de jogadores disponíveis (do template Jinja2)
+        const jogadoresDisponiveis = [
+            {% for jogador in todos_jogadores %}
+            {
+                id: {{ jogador.id }},
+                nome: "{{ jogador.nome_completo }}{% if jogador.apelido %} ({{ jogador.apelido }}){% endif %} - {{ jogador.numero if jogador.numero else 'S/N' }}"
+            },
+            {% endfor %}
+        ];
+
+        // Contador para novos jogadores adicionados dinamicamente
+        let playerIndex = {{ jogadores|length }};
+
+        // Função para alterar valores com limites
+        function changeValue(id, delta){
+            const el = document.getElementById(id);
+            if(!el) return;
+            const current = parseInt(el.value || '0', 10);
+            const next = Math.max(0, current + delta);
+            el.value = next;
+            el.dispatchEvent(new Event('input'));
+        }
+
+        // Atualiza placar e agregados com base nos inputs
+        function updateAll(){
+            // Scores
+            let scoreCasa = 0;
+            let scoreVisitante = 0;
+
+            // Aggregates
+            let totalFaltasFeitas = 0;
+            let totalFaltasSofridas = 0;
+            let totalAmarelos = 0;
+            let totalVermelhos = 0;
+
+            document.querySelectorAll('.stat-input-num').forEach(function(inp){
+                const stat = inp.getAttribute('data-stat');
+                const val = parseInt(inp.value || '0', 10);
+                if(stat === 'gol_marcado') {
+                    scoreCasa += val;
+                }
+                if(stat === 'gol_sofrido') {
+                    scoreVisitante += val;
+                }
+                if(stat === 'gol_contra') {
+                    scoreVisitante += val;
+                }
+                if(stat === 'falta_feita') {
+                    totalFaltasFeitas += val;
+                }
+                if(stat === 'falta_sofrida') {
+                    totalFaltasSofridas += val;
+                }
+                if(stat === 'cartao_amarelo') {
+                    totalAmarelos += val;
+                }
+                if(stat === 'cartao_vermelho') {
+                    totalVermelhos += val;
+                }
+            });
+
+            document.getElementById('scoreCasa').textContent = scoreCasa;
+            document.getElementById('scoreVisitante').textContent = scoreVisitante;
+
+            // Atualiza agregados com classes de alerta
+            const boxFaltasFeitas = document.getElementById('agg_faltas_feitas');
+            const boxFaltasSofridas = document.getElementById('agg_faltas_sofridas');
+            const boxAmarelos = document.getElementById('agg_amarelos');
+            const boxVermelhos = document.getElementById('agg_vermelhos');
+
+            // Falta Feita rules
+            boxFaltasFeitas.className = 'agg-box';
+            if(totalFaltasFeitas >= 6){
+                boxFaltasFeitas.classList.add('agg-danger');
+                boxFaltasFeitas.textContent = 'Faltas Feitas: ' + totalFaltasFeitas + ' — Tiro Livre';
+            } else if(totalFaltasFeitas === 5){
+                boxFaltasFeitas.classList.add('agg-warning');
+                boxFaltasFeitas.textContent = 'Faltas Feitas: ' + totalFaltasFeitas + ' — Quinta Falta Feita';
+            } else {
+                boxFaltasFeitas.textContent = 'Faltas Feitas: ' + totalFaltasFeitas;
+            }
+
+            // Falta Sofrida rules
+            boxFaltasSofridas.className = 'agg-box';
+            if(totalFaltasSofridas >= 6){
+                boxFaltasSofridas.classList.add('agg-danger');
+                boxFaltasSofridas.textContent = 'Faltas Sofridas: ' + totalFaltasSofridas + ' — Tiro Livre';
+            } else if(totalFaltasSofridas === 5){
+                boxFaltasSofridas.classList.add('agg-warning');
+                boxFaltasSofridas.textContent = 'Faltas Sofridas: ' + totalFaltasSofridas + ' — Quinta Falta Feita';
+            } else {
+                boxFaltasSofridas.textContent = 'Faltas Sofridas: ' + totalFaltasSofridas;
+            }
+
+            // Cartões
+            boxAmarelos.className = 'agg-box';
+            boxAmarelos.textContent = 'Cartões Amarelos: ' + totalAmarelos;
+
+            boxVermelhos.className = 'agg-box';
+            boxVermelhos.textContent = 'Cartões Vermelhos: ' + totalVermelhos;
+        }
+
+        // Função para criar select de jogadores
+        function createPlayerSelect(index) {
+            const select = document.createElement('select');
+            select.className = 'player-select';
+            select.name = `jogador_${index}`;
+            select.required = true;
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Selecione um jogador';
+            select.appendChild(defaultOption);
+
+            jogadoresDisponiveis.forEach(jogador => {
+                const option = document.createElement('option');
+                option.value = jogador.id;
+                option.textContent = jogador.nome;
+                select.appendChild(option);
+            });
+
+            return select;
+        }
+
+        // Função para criar input de estatística
+        function createStatInput(statName, index) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'stat-input stat-input-num';
+            input.setAttribute('data-stat', statName);
+            input.name = `${statName}_${index}`;
+            input.id = `${statName}_${index}`;
+            input.value = '0';
+            input.min = '0';
+            return input;
+        }
+
+        function addNewPlayer(){
+            const container = document.getElementById('playerRows');
+            const row = document.createElement('div');
+            row.className = 'player-row';
+
+            // Coluna do jogador (select)
+            const playerCol = document.createElement('div');
+            playerCol.appendChild(createPlayerSelect(playerIndex));
+            row.appendChild(playerCol);
+
+            // Colunas de estatísticas
+            const stats = [
+                'gol_marcado', 'gol_sofrido', 'gol_contra', 'assistencia', 
+                'falta_feita', 'falta_sofrida', 'cartao_amarelo', 'cartao_vermelho'
+            ];
+            
+            stats.forEach(stat => {
+                const statCol = document.createElement('div');
+                statCol.appendChild(createStatInput(stat, playerIndex));
+                row.appendChild(statCol);
+            });
+
+            container.appendChild(row);
+
+            // Adicionar listeners para os novos inputs
+            row.querySelectorAll('.stat-input-num').forEach(function(el){
+                el.addEventListener('input', function(){
+                    if(parseInt(el.value || '0', 10) < 0) el.value = 0;
+                    updateAll();
+                });
+            });
+
+            playerIndex++;
+
+            // Atualiza imediatamente
+            updateAll();
+        }
+
+        // Ao carregar a página, ligar eventos
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('.stat-input-num').forEach(function(el){
+                el.addEventListener('input', function(){
+                    // evitar negativos caso usuário edite manualmente
+                    if(parseInt(el.value || '0', 10) < 0) el.value = 0;
+                    updateAll();
+                });
+            });
+
+            // Atualiza inicialmente
+            updateAll();
+        });
+
+        // Variáveis do cronômetro
+        let timerInterval;
+        let seconds = 0;
+        let isRunning = false;
+
+        // Formata o tempo em MM:SS
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const remainingSeconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Inicia o cronômetro
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    document.getElementById('timer').textContent = formatTime(seconds);
+                }, 1000);
+            }
+        }
+
+        // Pausa o cronômetro
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+        }
+
+        // Zera o cronômetro
+        function resetTimer() {
+            pauseTimer();
+            seconds = 0;
+            document.getElementById('timer').textContent = '00:00';
+        }
+    </script>
+
+</div>
+
+</body>
+</html>

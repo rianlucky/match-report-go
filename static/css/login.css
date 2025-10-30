@@ -1,0 +1,159 @@
+/* ===== Container de Login ===== */
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f6fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    margin: 0;
+}
+
+/* ===== Cabeçalho com Logo ===== */
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.login-header h1 {
+    color: #333;
+    font-size: 24px;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ===== Alertas ===== */
+.alert {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* ===== Formulário ===== */
+.login-form {
+    text-align: left;
+    width: 280px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+input[type="text"].login-input,
+input[type="password"].login-input {
+    width: 280px;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+    display: block;
+}
+
+.login-input:focus {
+    border-color: #2d8975;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(45, 137, 117, 0.1);
+}
+
+/* ===== Botões ===== */
+.login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.btn-primary {
+    background-color: #2d8975;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: #236d5d;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #2d8975;
+    padding: 12px;
+    border: 2px solid #2d8975;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background-color: #f0f8f6;
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 480px) {
+    .login-box {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .login-logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .login-header h1 {
+        font-size: 20px;
+    }
+}

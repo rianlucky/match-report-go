@@ -4,9 +4,12 @@ db = SQLAlchemy()
 
 class Jogador(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    numero = db.Column(db.Integer, nullable=False)
+    nome_completo = db.Column(db.String(100), nullable=False)
+    apelido = db.Column(db.String(50))
+    idade = db.Column(db.Integer)
     posicao = db.Column(db.String(50))
+    data_entrada = db.Column(db.Date, nullable=False)
+    numero = db.Column(db.Integer)
 
     estatisticas = db.relationship("Estatistica", backref="jogador", lazy=True)
 
@@ -14,7 +17,7 @@ class Jogador(db.Model):
 class Partida(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     time_adversario = db.Column(db.String(100), nullable=False)
-    data = db.Column(db.String(20), nullable=False)
+    data = db.Column(db.Date, nullable=False)
 
     estatisticas = db.relationship("Estatistica", backref="partida", lazy=True)
 

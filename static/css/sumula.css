@@ -4,69 +4,342 @@ body {
     background-color: #f5f6fa;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    position: relative;
 }
 
-.container {
-    max-width: 1100px;
+/* ===== Logo ===== */
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    text-decoration: none;
+    transition: transform 0.2s;
+    display: block;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo img {
+    width: 70px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Layout principal */
+.sumula-container {
+    padding: 36px;
+    min-height: 680px;
+    max-width: 1600px;
+    width: 98%;
+    overflow-x: hidden;
     margin: 30px auto;
     background: #fff;
     border-radius: 12px;
-    padding: 25px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-/* ===== Título ===== */
-h1 {
-    text-align: center;
-    font-size: 26px;
-    color: #2c3e50;
-    margin-bottom: 20px;
-}
-/* ===== Tabela ===== */
-.table-sumula {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    font-size: 14px;
+.sumula-grid {
+    display: grid;
+    grid-template-columns: 1fr 460px;
+    gap: 20px;
+    align-items: start;
 }
 
-.table-sumula th,
-.table-sumula td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
+/* ===== Header e placar ===== */
+.sumula-header {
+    justify-content: space-between;
 }
 
-.table-sumula th {
-    background-color: #2c3e50;
-    color: white;
-    font-weight: bold;
-    font-size: 13px;
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
-.table-sumula tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.table-sumula tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* ===== Inputs numéricos ===== */
-.table-sumula input[type="number"] {
-    width: 50px;
-    padding: 5px;
+.team-name {
+    width: 110px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 6px;
     text-align: center;
-    font-size: 13px;
 }
 
-/* ===== Botão Salvar ===== */
+.score {
+    min-width: 32px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    display: inline-block;
+}
+
+/* ===== Áreas principais ===== */
+.player-area,
+.agg-area {
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.player-area {
+    max-height: 640px;
+    overflow: auto;
+}
+
+/* ===== Match Info ===== */
+.match-info {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.date-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 200px;
+}
+
+/* ===== Player Select ===== */
+.player-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+}
+
+.player-select:focus {
+    border-color: #2d8975;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(45, 137, 117, 0.1);
+}
+
+/* ===== Botões de Ação ===== */
+.btn-remover {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.2s;
+}
+
+.btn-remover:hover {
+    background-color: #cc0000;
+}
+
+.btn-adicionar {
+    background-color: #2d8975;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    margin-right: 10px;
+}
+
+.btn-adicionar:hover {
+    background-color: #236d5d;
+}
+
+/* ===== Tabela de jogadores ===== */
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr repeat(8, 1fr) 40px;  /* Última coluna para o botão remover */
+    grid-template-columns: minmax(140px,180px) repeat(8, minmax(50px,1fr));
+    gap: 8px;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    background: #f2f2f2;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.player-row {
+    display: grid;
+    grid-template-columns: minmax(140px,180px) repeat(8, minmax(50px,1fr));
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.player-name {
+    width: 130px;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* ===== Controles e inputs ===== */
+.stat-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+.stat-controls button {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    border: none;
+    background: #2d8975;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+}
+
+.stat-controls button:active {
+    transform: translateY(1px);
+}
+
+.stat-input {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 4px;
+    font-size: 14px;
+}
+
+/* ===== Agregados ===== */
+.agg-box {
+    padding: 12px;
+    border-radius: 10px;
+    background: #f7f7f7;
+    margin-bottom: 12px;
+    font-weight: bold;
+    text-align: right;
+}
+
+.agg-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.agg-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ===== Cronômetro ===== */
+.game-timer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.game-timer-display {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.timer-btn {
+    padding: 8px 16px;
+}
+
+/* ===== Radio Buttons do Período ===== */
+.game-period {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 15px;
+    transition: background-color 0.2s;
+}
+
+.radio-label:hover {
+    background-color: #f0f0f0;
+}
+
+.radio-label input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #2d8975;
+    border-radius: 50%;
+    margin: 0;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.radio-label input[type="radio"]:checked {
+    background-color: #2d8975;
+}
+
+.radio-label input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+/* ===== Botões ===== */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 12px;
+}
+
 .btn-salvar {
-    display: block;
-    margin: 0 auto;
-    background-color: #27ae60;
+    background-color: #2d8975;
     color: white;
     padding: 12px 25px;
     border: none;
@@ -77,5 +350,27 @@ h1 {
 }
 
 .btn-salvar:hover {
-    background-color: #219150;
+    background-color: #236d5d;
+}
+
+.btn-voltar {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    text-decoration: none;
+}
+
+.btn-voltar button {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ===== Responsividade ===== */
+@media(max-width: 1100px) {
+    .sumula-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header-row {
+        flex-wrap: wrap;
+    }
 }

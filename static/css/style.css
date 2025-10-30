@@ -33,11 +33,27 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo a {
+    display: block;
+    text-decoration: none;
 }
 
 .logo img {
     width: 70px;
     border-radius: 50%;
+    transition: box-shadow 0.2s ease;
+}
+
+.logo:hover img {
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 /* ===== Botões ===== */

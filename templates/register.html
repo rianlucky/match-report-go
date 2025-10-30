@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - MRG</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Logo e título -->
+            <div class="login-header">
+                <img src="{{ url_for('static', filename='images/MRG_Logo.png') }}" alt="MRG Logo" class="login-logo">
+                <h1>Criar Nova Conta</h1>
+            </div>
+
+            <!-- Mensagens de erro -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Formulário de registro -->
+            <form class="login-form" method="POST" action="{{ url_for('register') }}">
+                <div class="form-group">
+                    <label for="username">Nome de usuário</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Escolha um nome de usuário"
+                           class="login-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Digite uma senha"
+                           class="login-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirmar Senha</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required 
+                           placeholder="Confirme sua senha"
+                           class="login-input">
+                </div>
+
+                <div class="login-buttons">
+                    <button type="submit" class="btn-primary">Criar Conta</button>
+                    <a href="{{ url_for('login') }}" class="btn-secondary">Voltar para Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
