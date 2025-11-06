@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
+
     <div class="login-container">
         <div class="login-box">
             <!-- Logo e título -->
@@ -48,5 +49,18 @@
             </form>
         </div>
     </div>
+    <div class="accessibility-toggle">
+            <input type="checkbox" id="fontToggle" class="toggle-input">
+            <label for="fontToggle" class="toggle-label">
+                <span class="toggle-box">
+                    <svg class="check-icon" viewBox="0 0 24 24">
+                        <path d="M20.285 6.709a1 1 0 0 0-1.414-1.418l-9.17 9.17-4.242-4.243a1 1 0 0 0-1.415 1.415l5 5a1 1 0 0 0 1.415 0l9.826-9.824z"/>
+                    </svg>
+                </span>
+                <span class="toggle-text">Aumentar fonte</span>
+            </label>
+        </div>
+        
+        <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
 </body>
 </html>
