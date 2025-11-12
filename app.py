@@ -5,7 +5,39 @@ from flask_migrate import Migrate
 from datetime import datetime
 from functools import wraps
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-
+def ensure_partida_columns(engine):
+    """Ensure the partida table has the new columns added to the model.
+    Use the provided SQLAlchemy engine to operate on the same DB file the app uses.
+    This is best-effort and will not raise on failure.
+    """
+    try:
+        conn = engine.raw_connection()
+        cur = conn.cursor()
+        cur.execute("PRAGMA table_info(partida)")
+        existing = [r[1] for r in cur.fetchall()]
+        alters = []
+        if 'time_casa' not in existing:
+            alters.append("ALTER TABLE partida ADD COLUMN time_casa VARCHAR(100)")
+        if 'score_casa' not in existing:
+            alters.append("ALTER TABLE partida ADD COLUMN score_casa INTEGER DEFAULT 0")
+        if 'score_visitante' not in existing:
+            alters.append("ALTER TABLE partida ADD COLUMN score_visitante INTEGER DEFAULT 0")
+        for sql in alters:
+            try:
+                cur.execute(sql)
+            except Exception:
+                # best-effort: if one ALTER fails, continue with others
+                pass
+        if alters:
+            conn.commit()
+    except Exception:
+        # don't crash the app here; migrations can be handled via Flask-Migrate
+        pass
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///matchreport.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -16,7 +48,10 @@ migrate = Migrate(app, db)
 
 # Criar o banco de dados e as tabelas se não existirem
 with app.app_context():
+    # create tables if missing, then ensure new columns exist in existing DB
     db.create_all()
+    # pass SQLAlchemy engine so we operate on the same DB used by the ORM
+    ensure_partida_columns(db.engine)
     
 # Configuração do Flask-Login
 login_manager = LoginManager()
@@ -32,15 +67,18 @@ class User(UserMixin):
 test_user = User(1)
 users = {'admin': {'password': 'admin', 'id': 1}}
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User(user_id)
 
 # -------------------- ROTAS DE AUTENTICAÇÃO ---------------------
 
+
 @app.route("/")
 def index():
     return redirect(url_for('login'))
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -57,11 +95,13 @@ def login():
             flash('Usuário ou senha inválidos')
     return render_template("login.html")
 
+
 @app.route("/dashboard")
 @login_required
 def dashboard():
     partidas = Partida.query.all()
     return render_template("index.html", partidas=partidas)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -92,21 +132,25 @@ def register():
 
     return render_template('register.html')
 
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
 # ---- Plantel de Jogadores ----
 
 jogadores = []
+
 
 @app.route("/plantel")
 @login_required
 def plantel():
     jogadores = Jogador.query.all()  # pega todos os jogadores
     return render_template('plantel.html', jogadores=jogadores)
+
 
 @app.route("/add_jogador", methods=["GET", "POST"])
 @login_required
@@ -136,6 +180,7 @@ def add_jogador():
             return redirect(url_for("plantel"))
     return render_template("add_jogador.html")
 
+
 @app.route('/delete_jogador/<int:index>', methods=['POST', 'GET'])
 @login_required
 def delete_jogador(index):
@@ -144,6 +189,7 @@ def delete_jogador(index):
     db.session.commit()
     return redirect(url_for('plantel'))  # volta para a página do plantel
 
+
 # ---- Iniciar Partida ----
 @app.route("/sumula", methods=["GET", "POST"])
 @login_required
@@ -151,13 +197,24 @@ def sumula():
     todos_jogadores = Jogador.query.all()  # Lista de todos os jogadores cadastrados para o select
 
     if request.method == "POST":
+        time_casa = request.form.get("time_casa")
         time_adversario = request.form.get("time_adversario")
         data_partida = request.form.get("data_partida")
         
-        from datetime import datetime
+        # placar (valores atualizados pelo JS antes do submit)
+        try:
+            score_casa = int(request.form.get("score_casa", 0))
+        except ValueError:
+            score_casa = 0
+        try:
+            score_visitante = int(request.form.get("score_visitante", 0))
+        except ValueError:
+            score_visitante = 0
+        
         data_obj = datetime.strptime(data_partida, '%Y-%m-%d').date()
         
-        partida = Partida(time_adversario=time_adversario, data=data_obj)
+        partida = Partida(time_casa=time_casa, time_adversario=time_adversario, data=data_obj,
+                          score_casa=score_casa, score_visitante=score_visitante)
         db.session.add(partida)
         db.session.commit()
         # Primeiro: detectar jogadores novos adicionados na súmula (campos new_nome_<n>)
@@ -216,11 +273,13 @@ def sumula():
 
     return render_template("sumula.html", todos_jogadores=todos_jogadores)
 
+
 # ---- Histórico ----
 @app.route("/historico")
 def historico():
     partidas = Partida.query.all()
     return render_template("historico.html", partidas=partidas)
+
 
 # ---- Estatística e Histórico (em branco por enquanto) ----
 @app.route("/estatistica")

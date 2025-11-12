@@ -16,8 +16,13 @@ class Jogador(db.Model):
 
 class Partida(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    time_casa = db.Column(db.String(100), nullable=True)
     time_adversario = db.Column(db.String(100), nullable=False)
     data = db.Column(db.Date, nullable=False)
+
+    # Placar
+    score_casa = db.Column(db.Integer, default=0)
+    score_visitante = db.Column(db.Integer, default=0)
 
     estatisticas = db.relationship("Estatistica", backref="partida", lazy=True)
 

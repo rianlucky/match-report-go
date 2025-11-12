@@ -4,29 +4,46 @@
     <meta charset="UTF-8">
     <title>Histórico de Partidas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/historico.css') }}">
 </head>
 <body>
-    
     <div class="historico-container">
-        <h2>Histórico de Partidas</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Time da Casa</th>
-                    <th>Placar</th>
-                    <th>Time Adversário</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for partida in partidas %}
-                <tr>
-                    <td>{{ partida[1] }}</td>
-                    <td>{{ partida[2] }} x {{ partida[3] }}</td>
-                    <td>{{ partida[4] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="historico-actions">
+            <div class="left">
+                <h2>Histórico de Partidas</h2>
+            </div>
+            <div class="right">
+                <a class="btn-small" href="{{ url_for('dashboard') }}">Voltar</a>
+            </div>
+        </div>
+
+        <div class="historico-table-wrap">
+            <table class="historico-table">
+                <thead>
+                    <tr>
+                        <th>Time da Casa</th>
+                        <th>Placar</th>
+                        <th>Time Adversário</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if partidas|length == 0 %}
+                    <tr><td colspan="4" class="empty-msg">Nenhuma partida registrada ainda.</td></tr>
+                    {% else %}
+                    {% for partida in partidas %}
+                    <tr>
+                        <td>{{ partida.time_casa or '—' }}</td>
+                        <td>{{ partida.score_casa }} x {{ partida.score_visitante }}</td>
+                        <td>{{ partida.time_adversario or '—' }}</td>
+                        <td>{{ partida.data.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     </div>
     <div class="accessibility-toggle">
             <input type="checkbox" id="fontToggle" class="toggle-input">

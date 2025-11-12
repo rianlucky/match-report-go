@@ -1,0 +1,90 @@
+/* Styles specific to histórico page - aligned with global style.css */
+:root{
+    --primary:#1b6d69;
+    --accent:#4CAF50;
+    --muted:#f2f4f5;
+}
+
+.historico-container{
+    width: 95%;
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(8,24,40,0.08);
+}
+
+.historico-container h2{
+    font-size: 20px;
+    color: #222;
+    margin-bottom: 14px;
+}
+
+.historico-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 12px;
+}
+
+.historico-actions .left{display:flex;gap:8px;align-items:center}
+
+.historico-actions .btn-small{
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight:600;
+}
+
+.historico-table-wrap{ overflow-x:auto; }
+
+.historico-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0 10px;
+}
+
+.historico-table thead th{
+    text-align:left;
+    padding:12px 16px;
+    font-size:13px;
+    color:#555;
+}
+
+.historico-table tbody tr{
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfc 100%);
+    box-shadow: 0 2px 6px rgba(10,20,30,0.04);
+    border-radius: 8px;
+}
+
+.historico-table tbody td{
+    padding:14px 16px;
+    vertical-align:middle;
+    border: none;
+}
+
+.historico-table tbody tr td:first-child{ width:35%; font-weight:700; color:#233; }
+.historico-table tbody tr td:nth-child(2){ width:20%; font-weight:700; color:var(--accent); text-align:center }
+.historico-table tbody tr td:nth-child(3){ width:30%; color:#333 }
+.historico-table tbody tr td:nth-child(4){ width:15%; color:#777; text-align:right }
+
+.historico-table tbody tr:hover{
+    transform: translateY(-2px);
+    transition: transform 0.15s ease;
+}
+
+.empty-msg{
+    padding:20px;
+    text-align:center;
+    color:#666;
+}
+
+/* small responsive tweaks */
+@media (max-width:640px){
+    .historico-table tbody td{padding:10px 8px; font-size:13px}
+    .historico-actions{flex-direction:column;align-items:flex-start;gap:8px}
+}

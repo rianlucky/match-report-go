@@ -24,6 +24,9 @@
             <span id="scoreVisitante" class="score" aria-label="Placar Visitante">0</span>
             <input type="text" name="time_adversario" class="team-name" placeholder="Time Adversário" required>
         </div>
+        <!-- hidden inputs to submit placar values -->
+        <input type="hidden" name="score_casa" id="scoreCasaInput" value="0">
+        <input type="hidden" name="score_visitante" id="scoreVisitanteInput" value="0">
 
         <div class="match-info">
             <input type="date" name="data_partida" class="date-input" required>
@@ -212,6 +215,12 @@
 
             document.getElementById('scoreCasa').textContent = scoreCasa;
             document.getElementById('scoreVisitante').textContent = scoreVisitante;
+
+            // Atualiza hidden inputs para envio do formulário
+            const scoreCasaInput = document.getElementById('scoreCasaInput');
+            const scoreVisitanteInput = document.getElementById('scoreVisitanteInput');
+            if(scoreCasaInput) scoreCasaInput.value = scoreCasa;
+            if(scoreVisitanteInput) scoreVisitanteInput.value = scoreVisitante;
 
             // Atualiza agregados com classes de alerta
             const boxFaltasFeitas = document.getElementById('agg_faltas_feitas');
