@@ -11,27 +11,11 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <aside class="sidebar">
-        <a class="brand" href="{{ url_for('dashboard') }}">
-            <img src="{{ url_for('static', filename='images/MRG_Logo.png') }}" alt="MRG">
-            <span><strong>MRG</strong><small>Gestao Esportiva</small></span>
-        </a>
-        <nav class="side-nav">
-            <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">Dashboard</a>
-            <a href="{{ url_for('plantel') }}" class="{{ 'active' if request.endpoint in ['plantel', 'add_jogador'] else '' }}">Plantel</a>
-            <a href="{{ url_for('sumula') }}" class="{{ 'active' if request.endpoint == 'sumula' else '' }}">Sumula</a>
-            <a href="{{ url_for('historico') }}" class="{{ 'active' if request.endpoint in ['historico', 'partida_detalhe'] else '' }}">Historico</a>
-        </nav>
-        <div class="season-card">
-            <span>Temporada Atual</span>
-            <strong>2026</strong>
-            <small>Dados em tempo real</small>
-        </div>
-    </aside>
-
     <div class="app-shell">
         <header class="topbar">
-            <span class="menu-dot"></span>
+            <a class="top-logo" href="{{ url_for('dashboard') }}" aria-label="Ir para o dashboard">
+                <img src="{{ url_for('static', filename='images/MRG_Logo.png') }}" alt="MRG">
+            </a>
             <nav>
                 <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">Dashboard</a>
                 <a href="{{ url_for('plantel') }}" class="{{ 'active' if request.endpoint in ['plantel', 'add_jogador'] else '' }}">Plantel</a>

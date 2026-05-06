@@ -1,37 +1,38 @@
-function toggleFontSize() {
-    const checkbox = document.getElementById("fontToggle");
-    const root = document.documentElement;
+const FONT_PREF_KEY = "mrgFontSizeLarge";
 
-    if (checkbox.checked) {
-        root.style.setProperty("--font-scale", "1.25");
-        localStorage.setItem("fontSizeLarge", "true");
-    } else {
-        root.style.setProperty("--font-scale", "1");
-        localStorage.removeItem("fontSizeLarge");
-    }
-    applyFontScaling();
+function applyFontPreference(enabled) {
+    document.documentElement.style.setProperty("--font-scale", enabled ? "1.18" : "1");
+    document.querySelector(".accessibility-toggle-button")?.classList.toggle("active", enabled);
 }
 
-function applyFontScaling() {
-    const scale = getComputedStyle(document.documentElement).getPropertyValue("--font-scale") || "1";
-    document.querySelectorAll("body *").forEach(el => {
-        if (!["SCRIPT", "STYLE"].includes(el.tagName)) {
-            el.style.fontSize = `calc(${scale} * 1rem)`;
+function createAccessibilityButton() {
+    if (document.querySelector(".accessibility-control")) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "accessibility-control";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "accessibility-toggle-button";
+    button.setAttribute("aria-label", "Aumentar fonte");
+    button.setAttribute("title", "Aumentar fonte");
+    button.innerHTML = "<span>Aa</span>";
+
+    button.addEventListener("click", () => {
+        const enabled = localStorage.getItem(FONT_PREF_KEY) !== "true";
+        if (enabled) {
+            localStorage.setItem(FONT_PREF_KEY, "true");
+        } else {
+            localStorage.removeItem(FONT_PREF_KEY);
         }
+        applyFontPreference(enabled);
     });
+
+    wrapper.appendChild(button);
+    document.body.appendChild(wrapper);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("fontToggle");
-    if (!toggle) return;
-
-    if (localStorage.getItem("fontSizeLarge")) {
-        toggle.checked = true;
-        document.documentElement.style.setProperty("--font-scale", "1.25");
-    } else {
-        document.documentElement.style.setProperty("--font-scale", "1");
-    }
-
-    toggle.addEventListener("change", toggleFontSize);
-    applyFontScaling();
+    createAccessibilityButton();
+    applyFontPreference(localStorage.getItem(FONT_PREF_KEY) === "true");
 });
