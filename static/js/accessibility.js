@@ -23,6 +23,7 @@ function applyFontScaling() {
 
 window.addEventListener("DOMContentLoaded", () => {
     const toggle = document.getElementById("fontToggle");
+    if (!toggle) return;
 
     if (localStorage.getItem("fontSizeLarge")) {
         toggle.checked = true;

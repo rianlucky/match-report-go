@@ -1,80 +1,35 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Adicionar Jogador</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/player.css') }}">
-</head>
-<body>
-    <!-- Logo -->
-    <div class="logo">
-        <a href="{{ url_for('dashboard') }}">
-            <img src="{{ url_for('static', filename='images/MRG_Logo.png') }}" alt="Logo MRG">
-        </a>
+{% extends "base.html" %}
+{% block title %}Novo Jogador - MRG{% endblock %}
+{% block content %}
+<section class="page-title-row">
+    <div>
+        <p>{{ team_name }}</p>
+        <h1>Novo Jogador</h1>
+        <span>As informacoes salvas entram no plantel e na proxima sumula.</span>
     </div>
-    
-    <div class="player-card">
-            <a href="{{ url_for('dashboard') }}" class="close-btn">
-                <button class="close-btn">&times;</button>
-            </a>
-        <h2>Novo Jogador</h2>
-        <form method="POST" class="player-form">
-            <div class="form-group">
-                <label for="nome_completo">Nome Completo</label>
-                <input type="text" id="nome_completo" name="nome_completo" required>
-            </div>
+    <a class="btn-secondary" href="{{ url_for('plantel') }}">Voltar</a>
+</section>
 
-            <div class="form-group">
-                <label for="apelido">Apelido</label>
-                <input type="text" id="apelido" name="apelido">
-            </div>
-
-            <div class="form-group">
-                <label for="idade">Idade</label>
-                <input type="number" id="idade" name="idade" min="15" max="100" required>
-            </div>
-
-            <div class="form-group">
-                <label for="posicao">Posição</label>
-                <select id="posicao" name="posicao" required>
-                    <option value="">Selecione uma posição</option>
-                    <option value="Goleiro">Goleiro</option>
-                    <option value="Fixo">Fixo</option>
-                    <option value="Ala Direita">Ala Direita</option>
-                    <option value="Ala Esquerda">Ala Esquerda</option>
-                    <option value="Pivô">Pivô</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="numero">Número</label>
-                <input type="number" id="numero" name="numero" min="1" max="99">
-            </div>
-
-            <div class="form-group">
-                <label for="data_entrada">Data de Entrada</label>
-                <input type="date" id="data_entrada" name="data_entrada" required>
-            </div>
-
-            <div class="button-group">
-                <button type="submit" class="btn-primary">Salvar</button>
-                <a href="{{ url_for('plantel') }}" class="btn-secondary">Voltar</a>
-            </div>
-        </form>
-    </div>
-    <div class="accessibility-toggle">
-            <input type="checkbox" id="fontToggle" class="toggle-input">
-            <label for="fontToggle" class="toggle-label">
-                <span class="toggle-box">
-                    <svg class="check-icon" viewBox="0 0 24 24">
-                        <path d="M20.285 6.709a1 1 0 0 0-1.414-1.418l-9.17 9.17-4.242-4.243a1 1 0 0 0-1.415 1.415l5 5a1 1 0 0 0 1.415 0l9.826-9.824z"/>
-                    </svg>
-                </span>
-                <span class="toggle-text">Aumentar fonte</span>
-            </label>
+<section class="panel form-panel">
+    <form method="POST" class="form-grid">
+        <label>Nome completo<input type="text" name="nome_completo" required></label>
+        <label>Apelido<input type="text" name="apelido"></label>
+        <label>Idade<input type="number" name="idade" min="15" max="100"></label>
+        <label>Numero<input type="number" name="numero" min="1" max="99"></label>
+        <label>Posicao
+            <select name="posicao" required>
+                <option value="">Selecione</option>
+                <option>Goleiro</option>
+                <option>Fixo</option>
+                <option>Ala Direita</option>
+                <option>Ala Esquerda</option>
+                <option>Pivo</option>
+            </select>
+        </label>
+        <label>Data de entrada<input type="date" name="data_entrada" required></label>
+        <div class="form-actions">
+            <button class="btn-primary" type="submit">Salvar jogador</button>
         </div>
-        
-        <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
-</body>
-</html>
+    </form>
+</section>
+{% endblock %}

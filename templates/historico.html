@@ -1,62 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Histórico de Partidas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/historico.css') }}">
-</head>
-<body>
-    <div class="historico-container">
-        <div class="historico-actions">
-            <div class="left">
-                <h2>Histórico de Partidas</h2>
-            </div>
-            <div class="right">
-                <a class="btn-small" href="{{ url_for('dashboard') }}">Voltar</a>
-            </div>
-        </div>
+{% extends "base.html" %}
+{% block title %}Historico - MRG{% endblock %}
+{% block content %}
+<section class="page-title-row">
+    <div>
+        <p>{{ team_name }}</p>
+        <h1>Historico de Partidas</h1>
+        <span>Clique em uma partida para ver o resumo completo.</span>
+    </div>
+    <a class="btn-primary" href="{{ url_for('sumula') }}">Nova sumula</a>
+</section>
 
-        <div class="historico-table-wrap">
-            <table class="historico-table">
-                <thead>
-                    <tr>
-                        <th>Time da Casa</th>
-                        <th>Placar</th>
-                        <th>Time Adversário</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if partidas|length == 0 %}
-                    <tr><td colspan="4" class="empty-msg">Nenhuma partida registrada ainda.</td></tr>
-                    {% else %}
-                    {% for partida in partidas %}
-                    <tr>
-                        <td>{{ partida.time_casa or '—' }}</td>
-                        <td>{{ partida.score_casa }} x {{ partida.score_visitante }}</td>
-                        <td>{{ partida.time_adversario or '—' }}</td>
-                        <td>{{ partida.data.strftime('%d/%m/%Y') }}</td>
-                    </tr>
-                    {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Data</th><th>Casa</th><th>Placar</th><th>Adversario</th><th></th></tr></thead>
+            <tbody>
+                {% for partida in partidas %}
+                <tr>
+                    <td>{{ partida.data.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ partida.time_casa }}</td>
+                    <td><strong>{{ partida.score_casa }} x {{ partida.score_visitante }}</strong></td>
+                    <td>{{ partida.time_adversario }}</td>
+                    <td><a class="btn-secondary compact" href="{{ url_for('partida_detalhe', partida_id=partida.id) }}">Resumo</a></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="empty">Nenhuma partida registrada ainda.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    </div>
-    <div class="accessibility-toggle">
-            <input type="checkbox" id="fontToggle" class="toggle-input">
-            <label for="fontToggle" class="toggle-label">
-                <span class="toggle-box">
-                    <svg class="check-icon" viewBox="0 0 24 24">
-                        <path d="M20.285 6.709a1 1 0 0 0-1.414-1.418l-9.17 9.17-4.242-4.243a1 1 0 0 0-1.415 1.415l5 5a1 1 0 0 0 1.415 0l9.826-9.824z"/>
-                    </svg>
-                </span>
-                <span class="toggle-text">Aumentar fonte</span>
-            </label>
-        </div>
-        
-        <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
-</body>
-</html>
+</section>
+{% endblock %}

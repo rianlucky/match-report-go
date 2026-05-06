@@ -1,60 +1,40 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Plantel de Jogadores</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/plantel.css') }}">
-</head>
-<body>
-
-    <!-- Logo -->
-    <div class="logo">
-        <a href="{{ url_for('dashboard') }}">
-            <img src="{{ url_for('static', filename='images/MRG_Logo.png') }}" alt="Logo MRG">
-        </a>
+{% extends "base.html" %}
+{% block title %}Plantel - MRG{% endblock %}
+{% block content %}
+<section class="page-title-row">
+    <div>
+        <p>{{ team_name }}</p>
+        <h1>Plantel de Jogadores</h1>
+        <span>Cadastre atletas para que aparecam automaticamente na sumula.</span>
     </div>
+    <a class="btn-primary" href="{{ url_for('add_jogador') }}">Adicionar jogador</a>
+</section>
 
-    <div class="container">
-        <h2>Plantel de Jogadores</h2>
-
-        <ul class="player-list">
-            {% for jogador in jogadores %}
-                <li>
-                    {{ jogador.nome_completo }}
-                    {% if jogador.apelido %}({{ jogador.apelido }}){% endif %}
-                    - {{ jogador.numero if jogador.numero else 'S/N' }}
-                    - {{ jogador.posicao }}
-                    <a href="{{ url_for('delete_jogador', index=jogador.id) }}" class="delete-btn">
-                        <button>&times;</button>
-                    </a>
-                </li>    
-            {% else %}
-                <li>Nenhum jogador cadastrado</li>
-                    
-            {% endfor %}
-        </ul>
-
-        <div class="button-container">
-            <a href="{{ url_for('add_jogador') }}" class="btn-primary">
-                Adicionar Jogador
-            </a>
-            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Voltar</a>
-        </div>
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Numero</th><th>Jogador</th><th>Posicao</th><th>Idade</th><th>Entrada</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for jogador in jogadores %}
+                <tr>
+                    <td>{{ jogador.numero or 'S/N' }}</td>
+                    <td><strong>{{ jogador.nome_completo }}</strong><span>{{ jogador.apelido or '' }}</span></td>
+                    <td>{{ jogador.posicao }}</td>
+                    <td>{{ jogador.idade or '-' }}</td>
+                    <td>{{ jogador.data_entrada.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_jogador', jogador_id=jogador.id) }}">
+                            <button class="btn-danger" type="submit">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="empty">Nenhum jogador cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    </script>
-    <div class="accessibility-toggle">
-            <input type="checkbox" id="fontToggle" class="toggle-input">
-            <label for="fontToggle" class="toggle-label">
-                <span class="toggle-box">
-                    <svg class="check-icon" viewBox="0 0 24 24">
-                        <path d="M20.285 6.709a1 1 0 0 0-1.414-1.418l-9.17 9.17-4.242-4.243a1 1 0 0 0-1.415 1.415l5 5a1 1 0 0 0 1.415 0l9.826-9.824z"/>
-                    </svg>
-                </span>
-                <span class="toggle-text">Aumentar fonte</span>
-            </label>
-        </div>
-        
-        <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
-</body>
-</html>
+</section>
+{% endblock %}

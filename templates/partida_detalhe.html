@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Resumo da Partida - MRG{% endblock %}
+{% block content %}
+<section class="page-title-row">
+    <div>
+        <p>{{ partida.data.strftime('%d/%m/%Y') }}</p>
+        <h1>{{ partida.time_casa }} {{ partida.score_casa }} x {{ partida.score_visitante }} {{ partida.time_adversario }}</h1>
+        <span>Resumo individual dos atletas nesta partida.</span>
+    </div>
+    <a class="btn-secondary" href="{{ url_for('historico') }}">Voltar</a>
+</section>
+
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Jogador</th><th>Gols</th><th>Assist.</th><th>Faltas feitas</th><th>Faltas sofridas</th><th>Amarelos</th><th>Vermelhos</th></tr>
+            </thead>
+            <tbody>
+                {% for e in estatisticas %}
+                <tr>
+                    <td><strong>{{ e.jogador.nome_exibicao }}</strong></td>
+                    <td>{{ e.gol_marcado }}</td>
+                    <td>{{ e.assistencia }}</td>
+                    <td>{{ e.falta_feita }}</td>
+                    <td>{{ e.falta_sofrida }}</td>
+                    <td>{{ e.cartao_amarelo }}</td>
+                    <td>{{ e.cartao_vermelho }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="empty">Nenhuma estatistica registrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

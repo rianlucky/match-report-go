@@ -1,592 +1,124 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MRG Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-  :root {
-    --green: #00e676;
-    --green-dim: #00c853;
-    --bg: #0a0e0a;
-    --bg2: #111711;
-    --bg3: #182318;
-    --card: #111711;
-    --border: #1e2e1e;
-    --text: #e8f5e9;
-    --muted: #5a7a5a;
-    --yellow: #ffd600;
-    --red: #ff3d00;
-    --blue: #2979ff;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-  }
-
-  /* NAV */
-  nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2rem;
-    height: 60px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .nav-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.6rem;
-    letter-spacing: 3px;
-    color: var(--green);
-  }
-
-  .nav-links { display: flex; gap: 1.5rem; }
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--green); }
-
-  /* LAYOUT */
-  main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  /* HEADER */
-  .page-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .page-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    letter-spacing: 4px;
-    color: var(--green);
-    line-height: 1;
-  }
-
-  .page-subtitle {
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-top: 0.3rem;
-  }
-
-  .badge {
-    background: var(--green);
-    color: var(--bg);
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.25rem 0.7rem;
-    border-radius: 20px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  /* KPI CARDS */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .kpi {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.4rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .kpi::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--accent, var(--green));
-  }
-
-  .kpi-icon {
-    font-size: 1.6rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .kpi-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.4rem;
-    letter-spacing: 2px;
-    color: var(--accent, var(--green));
-    line-height: 1;
-  }
-
-  .kpi-label {
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    margin-top: 0.4rem;
-  }
-
-  /* CHART GRID */
-  .chart-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .chart-grid-3 {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.5rem;
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.2rem;
-  }
-
-  .card-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    color: var(--text);
-  }
-
-  .card-tag {
-    font-size: 0.7rem;
-    color: var(--muted);
-    background: var(--bg3);
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-  }
-
-  .chart-wrap {
-    position: relative;
-    height: 220px;
-  }
-
-  /* RANKING TABLE */
-  .ranking {
-    list-style: none;
-  }
-
-  .ranking li {
-    display: grid;
-    grid-template-columns: 24px 1fr auto;
-    gap: 0.8rem;
-    align-items: center;
-    padding: 0.7rem 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.88rem;
-  }
-
-  .ranking li:last-child { border-bottom: none; }
-
-  .rank-pos {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
-    color: var(--muted);
-  }
-
-  .rank-pos.gold { color: #ffd600; }
-  .rank-pos.silver { color: #b0bec5; }
-  .rank-pos.bronze { color: #ff8a65; }
-
-  .rank-name { font-weight: 500; }
-
-  .rank-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.2rem;
-    color: var(--green);
-    letter-spacing: 1px;
-  }
-
-  /* MATCH HISTORY */
-  .match-list { display: flex; flex-direction: column; gap: 0.7rem; }
-
-  .match-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto 1fr auto;
-    gap: 0.6rem;
-    align-items: center;
-    padding: 0.9rem 1rem;
-    background: var(--bg3);
-    border-radius: 10px;
-    font-size: 0.85rem;
-  }
-
-  .match-date {
-    color: var(--muted);
-    font-size: 0.75rem;
-    min-width: 70px;
-  }
-
-  .match-team {
-    font-weight: 500;
-    text-align: center;
-  }
-
-  .match-score {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 4px;
-    text-align: center;
-    min-width: 80px;
-  }
-
-  .score-win { color: var(--green); }
-  .score-draw { color: var(--yellow); }
-  .score-loss { color: var(--red); }
-
-  .match-result {
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-align: center;
-    min-width: 40px;
-  }
-
-  .result-w { background: rgba(0,230,118,0.15); color: var(--green); }
-  .result-d { background: rgba(255,214,0,0.15); color: var(--yellow); }
-  .result-l { background: rgba(255,61,0,0.15); color: var(--red); }
-
-  @media (max-width: 900px) {
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .chart-grid, .chart-grid-3 { grid-template-columns: 1fr; }
-  }
-</style>
-</head>
-<body>
-
-<nav>
-  <div class="nav-logo">⚽ MRG</div>
-  <div class="nav-links">
-    <a href="/dashboard" class="active">Dashboard</a>
-    <a href="/plantel">Plantel</a>
-    <a href="/sumula">Súmula</a>
-    <a href="/historico">Histórico</a>
-    <a href="/logout">Sair</a>
-  </div>
-</nav>
-
-<main>
-  <div class="page-header">
+{% extends "base.html" %}
+{% block title %}Dashboard - MRG{% endblock %}
+{% block head %}<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>{% endblock %}
+{% block content %}
+<section class="page-title-row">
     <div>
-      <div class="page-title">ESTATÍSTICAS</div>
-      <div class="page-subtitle">Temporada atual · Dados em tempo real</div>
+        <p>Ola, {{ team_name }}!</p>
+        <h1>Estatisticas da Temporada</h1>
+        <span>Acompanhe o desempenho do time em tempo real.</span>
     </div>
-    <span class="badge">AO VIVO</span>
-  </div>
+    <strong class="live-badge">Ao vivo</strong>
+</section>
 
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi" style="--accent: var(--green)">
-      <div class="kpi-icon">⚽</div>
-      <div class="kpi-value" id="kpi-gols">—</div>
-      <div class="kpi-label">Gols Marcados</div>
-    </div>
-    <div class="kpi" style="--accent: var(--blue)">
-      <div class="kpi-icon">🎯</div>
-      <div class="kpi-value" id="kpi-assists">—</div>
-      <div class="kpi-label">Assistências</div>
-    </div>
-    <div class="kpi" style="--accent: var(--yellow)">
-      <div class="kpi-icon">🟨</div>
-      <div class="kpi-value" id="kpi-amarelos">—</div>
-      <div class="kpi-label">Cartões Amarelos</div>
-    </div>
-    <div class="kpi" style="--accent: var(--red)">
-      <div class="kpi-icon">🟥</div>
-      <div class="kpi-value" id="kpi-vermelhos">—</div>
-      <div class="kpi-label">Cartões Vermelhos</div>
-    </div>
-  </div>
+<section class="kpi-grid">
+    <article class="kpi green"><span>Gols Marcados</span><strong id="kpi-gols">0</strong></article>
+    <article class="kpi blue"><span>Assistencias</span><strong id="kpi-assists">0</strong></article>
+    <article class="kpi yellow"><span>Cartoes Amarelos</span><strong id="kpi-amarelos">0</strong></article>
+    <article class="kpi red"><span>Cartoes Vermelhos</span><strong id="kpi-vermelhos">0</strong></article>
+</section>
 
-  <!-- Charts row 1 -->
-  <div class="chart-grid">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">ARTILHEIROS</div>
-        <span class="card-tag">Top 5 · Gols</span>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="chart-artilheiros"></canvas>
-      </div>
-    </div>
+<section class="dashboard-grid">
+    <article class="panel">
+        <div class="panel-head"><h2>Artilheiros</h2><span>Top 5 - Gols</span></div>
+        <div class="chart-box"><canvas id="chart-artilheiros"></canvas></div>
+    </article>
+    <article class="panel">
+        <div class="panel-head"><h2>Assistencias</h2><span>Top 5</span></div>
+        <div class="chart-box"><canvas id="chart-assists"></canvas></div>
+    </article>
+    <article class="panel panel-wide">
+        <div class="panel-head"><h2>Ultimas partidas</h2><a href="{{ url_for('historico') }}">Ver historico</a></div>
+        <div class="match-list" id="match-list"></div>
+    </article>
+    <article class="panel">
+        <div class="panel-head"><h2>Cartoes</h2><span>Top 5</span></div>
+        <div class="chart-box small"><canvas id="chart-cartoes"></canvas></div>
+    </article>
+</section>
+{% endblock %}
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">ASSISTÊNCIAS</div>
-        <span class="card-tag">Top 5</span>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="chart-assists"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Charts row 2 -->
-  <div class="chart-grid-3">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">ÚLTIMAS PARTIDAS</div>
-        <span class="card-tag">Histórico</span>
-      </div>
-      <div class="match-list" id="match-list">
-        <div style="color:var(--muted); font-size:0.85rem; padding: 1rem 0">Carregando partidas...</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">CARTÕES</div>
-        <span class="card-tag">Top 5</span>
-      </div>
-      <div class="chart-wrap" style="height:180px">
-        <canvas id="chart-cartoes"></canvas>
-      </div>
-      <ul class="ranking" id="ranking-cartoes" style="margin-top:0.8rem"></ul>
-    </div>
-  </div>
-
-</main>
-
+{% block scripts %}
 <script>
-// ─── CHART DEFAULTS ───────────────────────────────────────────────────────────
-Chart.defaults.color = '#5a7a5a';
-Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.color = "#667085";
+const colors = { green: "#05b96f", blue: "#2878f0", yellow: "#f7bd00", red: "#e92f3d" };
 
-const GREEN = '#00e676';
-const BLUE  = '#2979ff';
-const YELL  = '#ffd600';
-const RED   = '#ff3d00';
+function emptyState(label) {
+    return [{ nome: "Sem dados", gols: 0, assists: 0, amarelos: 0, vermelhos: 0, label }];
+}
 
-// ─── FETCH DATA FROM API ─────────────────────────────────────────────────────
 async function loadDashboard() {
-  try {
-    const r = await fetch('/api/dashboard');
-    const data = await r.json();
-    renderKPIs(data);
-    renderArtilheiros(data.artilheiros);
-    renderAssists(data.assistencias);
-    renderCartoes(data.cartoes);
+    const response = await fetch("/api/dashboard");
+    const data = await response.json();
+    document.getElementById("kpi-gols").textContent = data.total_gols;
+    document.getElementById("kpi-assists").textContent = data.total_assists;
+    document.getElementById("kpi-amarelos").textContent = data.total_amarelos;
+    document.getElementById("kpi-vermelhos").textContent = data.total_vermelhos;
+    renderBars("chart-artilheiros", data.artilheiros.length ? data.artilheiros : emptyState(), "gols", colors.green, false);
+    renderBars("chart-assists", data.assistencias.length ? data.assistencias : emptyState(), "assists", colors.blue, true);
+    renderCards(data.cartoes.length ? data.cartoes : emptyState());
     renderPartidas(data.partidas);
-  } catch(e) {
-    // fallback demo data if API is not yet ready
-    const demo = getDemoData();
-    renderKPIs(demo);
-    renderArtilheiros(demo.artilheiros);
-    renderAssists(demo.assistencias);
-    renderCartoes(demo.cartoes);
-    renderPartidas(demo.partidas);
-  }
 }
 
-function getDemoData() {
-  return {
-    total_gols: 47, total_assists: 29, total_amarelos: 12, total_vermelhos: 3,
-    artilheiros: [
-      {nome:'Carlos',gols:12},{nome:'Marcos',gols:9},{nome:'Thiago',gols:8},
-      {nome:'Lucas',gols:6},{nome:'Pedro',gols:5}
-    ],
-    assistencias: [
-      {nome:'Felipe',assists:8},{nome:'Bruno',assists:7},{nome:'Igor',assists:5},
-      {nome:'Vitor',assists:4},{nome:'Diego',assists:3}
-    ],
-    cartoes: [
-      {nome:'Rafael',amarelos:3,vermelhos:1},{nome:'André',amarelos:2,vermelhos:0},
-      {nome:'Gustavo',amarelos:2,vermelhos:1},{nome:'Caio',amarelos:2,vermelhos:0},
-      {nome:'Renato',amarelos:1,vermelhos:1}
-    ],
-    partidas: [
-      {data:'15/04',time_casa:'MRG',time_adv:'Atlético',score_casa:4,score_vis:2},
-      {data:'08/04',time_casa:'MRG',time_adv:'Inter FC',score_casa:3,score_vis:3},
-      {data:'01/04',time_casa:'Sporting',time_adv:'MRG',score_casa:1,score_vis:5},
-      {data:'25/03',time_casa:'MRG',time_adv:'Real SC',score_casa:2,score_vis:4},
-      {data:'18/03',time_casa:'MRG',time_adv:'União',score_casa:6,score_vis:1},
-    ]
-  };
+function renderBars(id, rows, key, color, horizontal) {
+    new Chart(document.getElementById(id), {
+        type: "bar",
+        data: {
+            labels: rows.map(row => row.nome),
+            datasets: [{ data: rows.map(row => row[key] || 0), backgroundColor: color, borderRadius: 6 }]
+        },
+        options: {
+            indexAxis: horizontal ? "y" : "x",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: horizontal, color: "#e8edf3" }, border: { display: false } },
+                y: { grid: { display: !horizontal, color: "#e8edf3" }, border: { display: false }, ticks: { precision: 0 } }
+            }
+        }
+    });
 }
 
-// ─── KPIs ─────────────────────────────────────────────────────────────────────
-function renderKPIs(d) {
-  animateCount('kpi-gols', d.total_gols);
-  animateCount('kpi-assists', d.total_assists);
-  animateCount('kpi-amarelos', d.total_amarelos);
-  animateCount('kpi-vermelhos', d.total_vermelhos);
+function renderCards(rows) {
+    new Chart(document.getElementById("chart-cartoes"), {
+        type: "bar",
+        data: {
+            labels: rows.map(row => row.nome),
+            datasets: [
+                { label: "Amarelos", data: rows.map(row => row.amarelos || 0), backgroundColor: colors.yellow, borderRadius: 5 },
+                { label: "Vermelhos", data: rows.map(row => row.vermelhos || 0), backgroundColor: colors.red, borderRadius: 5 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { boxWidth: 10 } } },
+            scales: {
+                x: { stacked: true, grid: { display: false }, border: { display: false } },
+                y: { stacked: true, grid: { color: "#e8edf3" }, border: { display: false }, ticks: { precision: 0 } }
+            }
+        }
+    });
 }
 
-function animateCount(id, target) {
-  const el = document.getElementById(id);
-  let cur = 0;
-  const step = Math.ceil(target / 30);
-  const timer = setInterval(() => {
-    cur = Math.min(cur + step, target);
-    el.textContent = cur;
-    if (cur >= target) clearInterval(timer);
-  }, 30);
-}
-
-// ─── ARTILHEIROS ─────────────────────────────────────────────────────────────
-function renderArtilheiros(data) {
-  const ctx = document.getElementById('chart-artilheiros').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.map(d => d.nome),
-      datasets: [{
-        data: data.map(d => d.gols),
-        backgroundColor: data.map((_, i) =>
-          i === 0 ? GREEN : `rgba(0,230,118,${0.7 - i*0.12})`),
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, border: { display: false } },
-        y: { grid: { color: '#1e2e1e' }, border: { display: false },
-             ticks: { stepSize: 2 } }
-      }
-    }
-  });
-}
-
-// ─── ASSISTÊNCIAS ─────────────────────────────────────────────────────────────
-function renderAssists(data) {
-  const ctx = document.getElementById('chart-assists').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.map(d => d.nome),
-      datasets: [{
-        data: data.map(d => d.assists),
-        backgroundColor: data.map((_, i) =>
-          i === 0 ? BLUE : `rgba(41,121,255,${0.7 - i*0.12})`),
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: '#1e2e1e' }, border: { display: false } },
-        y: { grid: { display: false }, border: { display: false } }
-      }
-    }
-  });
-}
-
-// ─── CARTÕES ──────────────────────────────────────────────────────────────────
-function renderCartoes(data) {
-  const ctx = document.getElementById('chart-cartoes').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.map(d => d.nome),
-      datasets: [
-        { label: 'Amarelos', data: data.map(d => d.amarelos),
-          backgroundColor: 'rgba(255,214,0,0.8)', borderRadius: 4, borderSkipped: false },
-        { label: 'Vermelhos', data: data.map(d => d.vermelhos),
-          backgroundColor: 'rgba(255,61,0,0.8)', borderRadius: 4, borderSkipped: false },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { boxWidth: 10, font: { size: 11 } } } },
-      scales: {
-        x: { stacked: true, grid: { display: false }, border: { display: false } },
-        y: { stacked: true, grid: { color: '#1e2e1e' }, border: { display: false } }
-      }
-    }
-  });
-
-  // mini ranking
-  const ul = document.getElementById('ranking-cartoes');
-  data.forEach((d, i) => {
-    const li = document.createElement('li');
-    li.className = 'ranking'.split(' ')[0];
-    li.innerHTML = `
-      <span class="rank-pos ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span>
-      <span class="rank-name">${d.nome}</span>
-      <span class="rank-val" style="color:var(--yellow)">${d.amarelos}🟨 ${d.vermelhos}🟥</span>
-    `;
-    li.style.cssText = 'display:grid;grid-template-columns:24px 1fr auto;gap:.8rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.85rem';
-    ul.appendChild(li);
-  });
-}
-
-// ─── PARTIDAS ─────────────────────────────────────────────────────────────────
 function renderPartidas(partidas) {
-  const list = document.getElementById('match-list');
-  list.innerHTML = '';
-  partidas.forEach(p => {
-    const casaIsUs = p.time_casa.toUpperCase().includes('MRG');
-    const nossoGol = casaIsUs ? p.score_casa : p.score_vis;
-    const deles    = casaIsUs ? p.score_vis  : p.score_casa;
-    const result   = nossoGol > deles ? 'W' : nossoGol < deles ? 'L' : 'D';
-    const cls      = result==='W'?'score-win':result==='D'?'score-draw':'score-loss';
-    const rcls     = result==='W'?'result-w':result==='D'?'result-d':'result-l';
-    const label    = result==='W'?'V':result==='D'?'E':'D';
-
-    const div = document.createElement('div');
-    div.className = 'match-item';
-    div.innerHTML = `
-      <span class="match-date">${p.data}</span>
-      <span class="match-team">${p.time_casa}</span>
-      <span class="match-score ${cls}">${p.score_casa} · ${p.score_vis}</span>
-      <span class="match-team">${p.time_adv}</span>
-      <span class="match-result ${rcls}">${label}</span>
-    `;
-    list.appendChild(div);
-  });
+    const list = document.getElementById("match-list");
+    if (!partidas.length) {
+        list.innerHTML = '<div class="empty">Nenhuma partida registrada ainda.</div>';
+        return;
+    }
+    list.innerHTML = partidas.map(p => `
+        <a class="match-row" href="/historico/${p.id}">
+            <span>${p.data}</span>
+            <strong>${p.time_casa}</strong>
+            <b>${p.score_casa} x ${p.score_vis}</b>
+            <strong>${p.time_adv}</strong>
+        </a>
+    `).join("");
 }
 
 loadDashboard();
 </script>
-</body>
-</html>
+{% endblock %}
