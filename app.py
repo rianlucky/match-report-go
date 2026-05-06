@@ -1,45 +1,47 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import re
+import os
 from models import db, Jogador, Partida, Estatistica
 from flask_migrate import Migrate
 from datetime import datetime
 from functools import wraps
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-def ensure_partida_columns(engine):
-    """Ensure the partida table has the new columns added to the model.
-    Use the provided SQLAlchemy engine to operate on the same DB file the app uses.
-    This is best-effort and will not raise on failure.
-    """
-    try:
-        conn = engine.raw_connection()
-        cur = conn.cursor()
-        cur.execute("PRAGMA table_info(partida)")
-        existing = [r[1] for r in cur.fetchall()]
-        alters = []
-        if 'time_casa' not in existing:
-            alters.append("ALTER TABLE partida ADD COLUMN time_casa VARCHAR(100)")
-        if 'score_casa' not in existing:
-            alters.append("ALTER TABLE partida ADD COLUMN score_casa INTEGER DEFAULT 0")
-        if 'score_visitante' not in existing:
-            alters.append("ALTER TABLE partida ADD COLUMN score_visitante INTEGER DEFAULT 0")
-        for sql in alters:
-            try:
-                cur.execute(sql)
-            except Exception:
-                # best-effort: if one ALTER fails, continue with others
-                pass
-        if alters:
-            conn.commit()
-    except Exception:
-        # don't crash the app here; migrations can be handled via Flask-Migrate
-        pass
-    finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
+from sqlalchemy import func
+#def ensure_partida_columns(engine):
+#    """Ensure the partida table has the new columns added to the model.
+#    Use the provided SQLAlchemy engine to operate on the same DB file the app uses.
+#    This is best-effort and will not raise on failure.
+#    """
+#    try:
+#        conn = engine.raw_connection()
+#        cur = conn.cursor()
+#        cur.execute("PRAGMA table_info(partida)")
+#        existing = [r[1] for r in cur.fetchall()]
+#        alters = []
+#        if 'time_casa' not in existing:
+#            alters.append("ALTER TABLE partida ADD COLUMN time_casa VARCHAR(100)")
+#        if 'score_casa' not in existing:
+#            alters.append("ALTER TABLE partida ADD COLUMN score_casa INTEGER DEFAULT 0")
+#        if 'score_visitante' not in existing:
+#            alters.append("ALTER TABLE partida ADD COLUMN score_visitante INTEGER DEFAULT 0")
+#        for sql in alters:
+#            try:
+#                cur.execute(sql)
+#            except Exception:
+#                # best-effort: if one ALTER fails, continue with others
+#                pass
+#        if alters:
+#            conn.commit()
+#    except Exception:
+#        # don't crash the app here; migrations can be handled via Flask-Migrate
+#        pass
+#    finally:
+#        try:
+#            conn.close()
+#        except Exception:
+#            pass
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///matchreport.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///matchreport.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'seu_secret_key_aqui'  # Importante para sessões
 
@@ -51,7 +53,7 @@ with app.app_context():
     # create tables if missing, then ensure new columns exist in existing DB
     db.create_all()
     # pass SQLAlchemy engine so we operate on the same DB used by the ORM
-    ensure_partida_columns(db.engine)
+#    ensure_partida_columns(db.engine)
     
 # Configuração do Flask-Login
 login_manager = LoginManager()
@@ -99,8 +101,7 @@ def login():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    partidas = Partida.query.all()
-    return render_template("index.html", partidas=partidas)
+    return render_template("dashboard.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -288,3 +289,103 @@ def estatistica():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
+
+# ─── ROTA DA API DO DASHBOARD ────────────────────────────────────────────────
+ 
+@app.route("/api/dashboard")
+@login_required
+def api_dashboard():
+    """Retorna JSON com todas as estatísticas para o dashboard."""
+ 
+    # Total de gols marcados
+    total_gols = db.session.query(
+        func.sum(Estatistica.gol_marcado)
+    ).scalar() or 0
+ 
+    # Total de assistências
+    total_assists = db.session.query(
+        func.sum(Estatistica.assistencia)
+    ).scalar() or 0
+ 
+    # Total de cartões amarelos
+    total_amarelos = db.session.query(
+        func.sum(Estatistica.cartao_amarelo)
+    ).scalar() or 0
+ 
+    # Total de cartões vermelhos
+    total_vermelhos = db.session.query(
+        func.sum(Estatistica.cartao_vermelho)
+    ).scalar() or 0
+ 
+    # Top 5 artilheiros
+    artilheiros_q = db.session.query(
+        Jogador.apelido.label("nome"),
+        func.sum(Estatistica.gol_marcado).label("gols")
+    ).join(Estatistica, Estatistica.jogador_id == Jogador.id
+    ).group_by(Jogador.id
+    ).order_by(func.sum(Estatistica.gol_marcado).desc()
+    ).limit(5).all()
+ 
+    artilheiros = [
+        {"nome": r.nome or "—", "gols": int(r.gols or 0)}
+        for r in artilheiros_q
+    ]
+ 
+    # Top 5 assistências
+    assists_q = db.session.query(
+        Jogador.apelido.label("nome"),
+        func.sum(Estatistica.assistencia).label("assists")
+    ).join(Estatistica, Estatistica.jogador_id == Jogador.id
+    ).group_by(Jogador.id
+    ).order_by(func.sum(Estatistica.assistencia).desc()
+    ).limit(5).all()
+ 
+    assistencias = [
+        {"nome": r.nome or "—", "assists": int(r.assists or 0)}
+        for r in assists_q
+    ]
+ 
+    # Top 5 cartões
+    cartoes_q = db.session.query(
+        Jogador.apelido.label("nome"),
+        func.sum(Estatistica.cartao_amarelo).label("amarelos"),
+        func.sum(Estatistica.cartao_vermelho).label("vermelhos")
+    ).join(Estatistica, Estatistica.jogador_id == Jogador.id
+    ).group_by(Jogador.id
+    ).order_by(
+        (func.sum(Estatistica.cartao_amarelo) + func.sum(Estatistica.cartao_vermelho)).desc()
+    ).limit(5).all()
+ 
+    cartoes = [
+        {
+            "nome": r.nome or "—",
+            "amarelos": int(r.amarelos or 0),
+            "vermelhos": int(r.vermelhos or 0)
+        }
+        for r in cartoes_q
+    ]
+ 
+    # Últimas 5 partidas
+    ultimas = Partida.query.order_by(Partida.data.desc()).limit(5).all()
+    partidas = [
+        {
+            "data": p.data.strftime("%d/%m"),
+            "time_casa": p.time_casa or "Casa",
+            "time_adv": p.time_adversario,
+            "score_casa": p.score_casa or 0,
+            "score_vis": p.score_visitante or 0
+        }
+        for p in ultimas
+    ]
+ 
+    return jsonify({
+        "total_gols": int(total_gols),
+        "total_assists": int(total_assists),
+        "total_amarelos": int(total_amarelos),
+        "total_vermelhos": int(total_vermelhos),
+        "artilheiros": artilheiros,
+        "assistencias": assistencias,
+        "cartoes": cartoes,
+        "partidas": partidas
+    })
+ 
